@@ -1,0 +1,22 @@
+{
+  "name": "farmtrace-backend",
+  "version": "1.0.0",
+  "description": "FarmTrace IoT MQTT Ingestion, PostgreSQL, and WebSocket Gateway",
+  "main": "server.ts",
+  "scripts": {
+    "start": "ts-node server.ts",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "mqtt": "^5.3.4",
+    "pg": "^8.11.3",
+    "ws": "^8.16.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@types/pg": "^8.11.0",
+    "@types/ws": "^8.5.10",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  }
+}

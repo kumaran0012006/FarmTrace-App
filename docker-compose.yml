@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: farmtrace_postgres
+    environment:
+      POSTGRES_USER: farmtrace
+      POSTGRES_PASSWORD: secret_farmtrace_password
+      POSTGRES_DB: farmtrace
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+    restart: unless-stopped
+
+  mosquitto:
+    image: eclipse-mosquitto:2.0
+    container_name: farmtrace_mqtt
+    ports:
+      - "1883:1883"
+      - "8883:8883"
+      - "8083:8083" # WebSocket port for Android/Web clients
+    volumes:
+      - ./docker/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: farmtrace_backend
+    environment:
+      PORT: 4000
+      DATABASE_URL: postgres://farmtrace:secret_farmtrace_password@postgres:5432/farmtrace
+      MQTT_BROKER_URL: mqtt://mosquitto:1883
+    ports:
+      - "4000:4000"
+      - "8080:8080" # WebSocket push server
+    depends_on:
+      - postgres
+      - mosquitto
+    restart: unless-stopped
+
+volumes:
+  pgdata:
